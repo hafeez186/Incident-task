@@ -1,0 +1,255 @@
+# Azure DevOps CI/CD Pipeline for Incident Management Tool
+# This pipeline builds, tests, and deploys your Next.js application
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    exclude:
+      - README.md
+      - docs/*
+      - .gitignore
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+
+variables:
+  # Build Variables
+  buildConfiguration: 'Release'
+  nodeVersion: '18.x'
+  
+  # Azure Static Web Apps Variables (for hosting)
+  azureStaticWebAppsApiToken: $(AZURE_STATIC_WEB_APPS_API_TOKEN)
+  
+  # Azure App Service Variables (alternative hosting)
+  azureSubscription: 'your-azure-subscription'
+  webAppName: 'incident-management-app'
+  resourceGroupName: 'rg-incident-management'
+
+stages:
+  # Stage 1: Build and Test
+  - stage: BuildAndTest
+    displayName: 'Build and Test'
+    jobs:
+      - job: BuildJob
+        displayName: 'Build and Test Application'
+        pool:
+          vmImage: 'ubuntu-latest'
+        
+        steps:
+          # Checkout code
+          - checkout: self
+            displayName: 'Checkout Repository'
+            fetchDepth: 0
+
+          # Setup Node.js
+          - task: NodeTool@0
+            displayName: 'Setup Node.js $(nodeVersion)'
+            inputs:
+              versionSpec: '$(nodeVersion)'
+
+          # Cache node_modules for faster builds
+          - task: Cache@2
+            displayName: 'Cache node_modules'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+                npm
+              path: '$(Pipeline.Workspace)/.npm'
+
+          # Install dependencies
+          - script: |
+              npm ci --cache $(Pipeline.Workspace)/.npm --prefer-offline
+            displayName: 'Install Dependencies'
+
+          # Run linting
+          - script: |
+              npm run lint
+            displayName: 'Run ESLint'
+            continueOnError: false
+
+          # Run tests (when you add them)
+          - script: |
+              npm run test:ci
+            displayName: 'Run Tests and Build'
+
+          # Build application
+          - script: |
+              npm run build
+            displayName: 'Build Application'
+            env:
+              NODE_ENV: production
+
+          # Create deployment artifact
+          - task: ArchiveFiles@2
+            displayName: 'Create Deployment Package'
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+              verbose: true
+
+          # Publish build artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Build Artifacts'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'incident-management-app'
+              publishLocation: 'Container'
+
+          # Publish test results (when you add proper testing)
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/test-results.xml'
+              failTaskOnFailedTests: true
+              testRunTitle: 'Unit Tests'
+            continueOnError: true
+
+  # Stage 2: Deploy to Staging
+  - stage: DeployStaging
+    displayName: 'Deploy to Staging'
+    dependsOn: BuildAndTest
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    
+    jobs:
+      - deployment: DeployToStaging
+        displayName: 'Deploy to Azure Static Web Apps (Staging)'
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: 'staging'
+        
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  displayName: 'Checkout Repository'
+
+                - task: NodeTool@0
+                  displayName: 'Setup Node.js $(nodeVersion)'
+                  inputs:
+                    versionSpec: '$(nodeVersion)'
+
+                - script: |
+                    npm ci
+                    npm run build
+                  displayName: 'Install and Build'
+                  env:
+                    NODE_ENV: production
+
+                # Deploy to Azure Static Web Apps
+                - task: AzureStaticWebApp@0
+                  displayName: 'Deploy to Azure Static Web Apps'
+                  inputs:
+                    azure_static_web_apps_api_token: $(azureStaticWebAppsApiToken)
+                    app_location: '/'
+                    api_location: ''
+                    output_location: '.next'
+                    skip_app_build: true
+
+  # Stage 3: Deploy to Production
+  - stage: DeployProduction
+    displayName: 'Deploy to Production'
+    dependsOn: BuildAndTest
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    
+    jobs:
+      - deployment: DeployToProduction
+        displayName: 'Deploy to Azure App Service (Production)'
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: 'production'
+        
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  displayName: 'Checkout Repository'
+
+                - task: NodeTool@0
+                  displayName: 'Setup Node.js $(nodeVersion)'
+                  inputs:
+                    versionSpec: '$(nodeVersion)'
+
+                - script: |
+                    npm ci
+                    npm run build
+                  displayName: 'Install and Build'
+                  env:
+                    NODE_ENV: production
+
+                # Deploy to Azure App Service
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to Azure App Service'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: 'webAppLinux'
+                    appName: '$(webAppName)'
+                    resourceGroupName: '$(resourceGroupName)'
+                    package: '$(Pipeline.Workspace)/**/*.zip'
+                    runtimeStack: 'NODE|18-lts'
+                    startUpCommand: 'npm start'
+
+                # Health check after deployment
+                - task: Delay@1
+                  displayName: 'Wait for App to Start'
+                  inputs:
+                    delayForMinutes: '2'
+
+                - task: PowerShell@2
+                  displayName: 'Health Check'
+                  inputs:
+                    targetType: 'inline'
+                    script: |
+                      $response = Invoke-WebRequest -Uri "https://$(webAppName).azurewebsites.net" -UseBasicParsing
+                      if ($response.StatusCode -ne 200) {
+                        Write-Error "Health check failed. Status: $($response.StatusCode)"
+                        exit 1
+                      }
+                      Write-Host "✅ Application is healthy and running!"
+
+  # Stage 4: Post-Deployment Tasks
+  - stage: PostDeployment
+    displayName: 'Post-Deployment Tasks'
+    dependsOn: DeployProduction
+    condition: succeeded()
+    
+    jobs:
+      - job: PostDeploymentJob
+        displayName: 'Post-Deployment Tasks'
+        pool:
+          vmImage: 'ubuntu-latest'
+        
+        steps:
+          # Send notification to Teams/Slack
+          - task: PowerShell@2
+            displayName: 'Send Deployment Notification'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "🚀 Deployment completed successfully!"
+                Write-Host "📱 Application URL: https://$(webAppName).azurewebsites.net"
+                Write-Host "🏗️ Build ID: $(Build.BuildId)"
+                Write-Host "📋 Version: $(Build.SourceVersion)"
+                
+                # You can add webhook calls to Teams/Slack here
+                # Example: Invoke-RestMethod -Uri $env:TEAMS_WEBHOOK -Method Post -Body $body
+
+          # Update documentation
+          - script: |
+              echo "Last deployed: $(date)" >> deployment-log.txt
+              echo "Build ID: $(Build.BuildId)" >> deployment-log.txt
+              echo "Version: $(Build.SourceVersion)" >> deployment-log.txt
+            displayName: 'Update Deployment Log'
