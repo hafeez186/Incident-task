@@ -185,7 +185,7 @@ stages:
                     versionSpec: '$(nodeVersion)'
 
                 - script: |
-                    cd "Incident Managment tool kb assistance"
+                    cd "C:\codevibe\Incident Managment tool kb assistance"
                     npm ci
                     npm run build
                   displayName: 'Install and Build'
