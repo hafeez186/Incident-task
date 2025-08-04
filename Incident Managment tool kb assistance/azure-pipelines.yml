@@ -142,7 +142,13 @@ stages:
                     versionSpec: '$(nodeVersion)'
 
                 - script: |
+                    echo "Current Directory: $(System.DefaultWorkingDirectory)"
+                    ls "$(System.DefaultWorkingDirectory)/Incident Managment tool kb assistance"
                     cd "$(System.DefaultWorkingDirectory)/Incident Managment tool kb assistance"
+                    if [ ! -f package.json ]; then
+                      echo "Error: package.json not found in $(System.DefaultWorkingDirectory)/Incident Managment tool kb assistance"
+                      exit 1
+                    fi
                     npm ci
                     npm run build
                   displayName: 'Install and Build'
