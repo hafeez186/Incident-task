@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable standalone output for Docker deployment - only for production builds
-  ...(process.env.NODE_ENV === 'production' && { output: 'export' }),
+  // Enable static export for GitHub Pages deployment
+  output: 'export',
   trailingSlash: true,
   
-  // Optimize images
+  // Optimize images for static export
   images: {
-    unoptimized: process.env.NODE_ENV === 'production', // Only for static export compatibility in production
+    unoptimized: true, // Required for static export
     domains: [],
   },
 
@@ -66,11 +66,9 @@ const nextConfig = {
   // Experimental features
   serverExternalPackages: ['@prisma/client'], // Updated from experimental.serverComponentsExternalPackages
 
-  // Only use basePath and assetPrefix for production static deployments
-  ...(process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true' && {
-    basePath: '/AI-based-incidentmanagement',
-    assetPrefix: '/AI-based-incidentmanagement',
-  }),
+  // GitHub Pages configuration
+  basePath: '/AI-based-incidentmanagement',
+  assetPrefix: '/AI-based-incidentmanagement',
   eslint: {
     ignoreDuringBuilds: true,
   },
