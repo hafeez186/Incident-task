@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Azure DevOps CI/CD Pipeline for Incident Management Tool
 # This pipeline builds, tests, and deploys your Next.js application
 
@@ -264,26 +263,3 @@ stages:
               echo "Build ID: $(Build.BuildId)" >> deployment-log.txt
               echo "Version: $(Build.SourceVersion)" >> deployment-log.txt
             displayName: 'Update Deployment Log'
-=======
-# Node.js
-# Build a general Node.js project with npm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
-
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
->>>>>>> ec9a79927ec3363aaeeef7535b0713dd7d340a41
