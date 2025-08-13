@@ -32,6 +32,7 @@ jobs:
       - name: Build for static export
         run: |
           export STATIC_EXPORT=true
+          export NODE_ENV=production
           npm run build
         
       - name: Setup Pages
