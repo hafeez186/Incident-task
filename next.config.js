@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for GitHub Pages deployment
-  output: 'export',
+  // For Azure Web App deployment - use standalone output
+  output: process.env.AZURE_WEBAPP ? 'standalone' : 'export',
   trailingSlash: true,
   
-  // Optimize images for static export
+  // Optimize images for deployment
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: process.env.AZURE_WEBAPP ? false : true, // Enable optimization for Azure Web App
     domains: [],
   },
 
@@ -66,9 +66,12 @@ const nextConfig = {
   // Experimental features
   serverExternalPackages: ['@prisma/client'], // Updated from experimental.serverComponentsExternalPackages
 
-  // GitHub Pages configuration
-  basePath: '/AI-based-incidentmanagement',
-  assetPrefix: '/AI-based-incidentmanagement',
+  // Conditional configuration based on deployment target
+  ...(process.env.AZURE_WEBAPP ? {} : {
+    // GitHub Pages configuration
+    basePath: '/AI-based-incidentmanagement',
+    assetPrefix: '/AI-based-incidentmanagement',
+  }),
   eslint: {
     ignoreDuringBuilds: true,
   },

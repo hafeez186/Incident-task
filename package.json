@@ -11,7 +11,9 @@
     "test": "echo 'No tests yet' && exit 0",
     "test:ci": "npm run lint && npm run build",
     "export": "next export",
-    "build:static": "cross-env STATIC_EXPORT=true next build"
+    "build:static": "cross-env STATIC_EXPORT=true next build",
+    "build:azure": "cross-env AZURE_WEBAPP=true next build",
+    "start:azure": "cross-env AZURE_WEBAPP=true next start"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
