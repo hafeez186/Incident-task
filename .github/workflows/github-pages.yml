@@ -32,8 +32,8 @@ jobs:
         
       - name: Build for GitHub Pages
         env:
-          STATIC_EXPORT: true
           NODE_ENV: production
+          STATIC_EXPORT: true
         run: npm run build:static
         
       - name: Setup Pages
