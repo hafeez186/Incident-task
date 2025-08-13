@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Configure for static export
+export const dynamic = 'force-static'
+
 // Mobile tickets API - optimized for mobile apps
 export async function GET(request: NextRequest) {
   try {

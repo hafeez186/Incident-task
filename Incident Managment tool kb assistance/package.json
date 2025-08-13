@@ -9,7 +9,9 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "test": "echo 'No tests yet' && exit 0",
-    "test:ci": "npm run lint && npm run build"
+    "test:ci": "npm run lint && npm run build",
+    "export": "next build",
+    "deploy:azure": "npm run export && echo 'Ready for Azure Static Web Apps deployment'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

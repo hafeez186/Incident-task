@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Configure for static export
+export const dynamic = 'force-static'
+
 // This would typically use OpenAI or another AI service
 // For demo purposes, we'll use a simple keyword matching algorithm
 

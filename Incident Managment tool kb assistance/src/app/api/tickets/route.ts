@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Configure for static export
+export const dynamic = 'force-static'
+
 interface Ticket {
   id: string
   title: string

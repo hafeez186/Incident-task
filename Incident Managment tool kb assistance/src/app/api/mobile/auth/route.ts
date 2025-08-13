@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Configure for static export
+export const dynamic = 'force-static'
+
 // Mobile app authentication endpoint
 export async function POST(request: NextRequest) {
   try {

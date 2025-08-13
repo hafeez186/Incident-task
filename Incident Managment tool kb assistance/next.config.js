@@ -1,11 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable standalone output for Docker deployment
-  output: 'standalone',
+  // Enable static export for Azure Static Web Apps
+  output: 'export',
+  trailingSlash: true,
   
-  // Optimize images
+  // Optimize images for static export
   images: {
-    unoptimized: true, // For static export compatibility
+    unoptimized: true,
     domains: [],
   },
 

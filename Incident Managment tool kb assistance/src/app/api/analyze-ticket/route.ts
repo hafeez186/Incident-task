@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
+// Configure for static export
+export const dynamic = 'force-static'
+
 interface AnalysisRequest {
   ticketTitle: string
   ticketDescription: string
