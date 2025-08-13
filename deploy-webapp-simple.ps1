@@ -1,4 +1,4 @@
-# Simple Azure Web App Deployment - Local Testing
+npm run# Simple Azure Web App Deployment - Local Testing
 # Run this script from your project root directory
 
 Write-Host "🚀 Starting Azure Web App Deployment Process..." -ForegroundColor Green
