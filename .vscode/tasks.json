@@ -14,12 +14,12 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Build for Azure",
+			"label": "Build Application",
 			"type": "shell",
 			"command": "npm",
 			"args": [
 				"run",
-				"build:azure"
+				"build"
 			],
 			"group": "build",
 			"presentation": {
@@ -30,96 +30,6 @@
 				"showReuseMessage": true,
 				"clear": false
 			}
-		},
-		{
-			"label": "Deploy to Azure App Service",
-			"type": "shell",
-			"command": "az",
-			"args": [
-				"webapp",
-				"deployment",
-				"source",
-				"config-zip",
-				"--resource-group",
-				"${input:resourceGroup}",
-				"--name",
-				"${input:webAppName}",
-				"--src",
-				"./deployment.zip"
-			],
-			"group": "build",
-			"dependsOn": "Build for Azure",
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared"
-			}
-		},
-		{
-			"label": "Azure: Create Web App",
-			"type": "shell",
-			"command": "az",
-			"args": [
-				"webapp",
-				"create",
-				"--name",
-				"${input:webAppName}",
-				"--resource-group",
-				"${input:resourceGroup}",
-				"--plan",
-				"${input:appServicePlan}",
-				"--runtime",
-				"NODE:18-lts"
-			],
-			"group": "build",
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared"
-			}
-		},
-		{
-			"label": "Azure: View Logs",
-			"type": "shell",
-			"command": "az",
-			"args": [
-				"webapp",
-				"log",
-				"tail",
-				"--name",
-				"${input:webAppName}",
-				"--resource-group",
-				"${input:resourceGroup}"
-			],
-			"group": "test",
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared"
-			}
-		}
-	],
-	"inputs": [
-		{
-			"id": "resourceGroup",
-			"description": "Azure Resource Group Name",
-			"default": "rg-incident-mgmt",
-			"type": "promptString"
-		},
-		{
-			"id": "webAppName",
-			"description": "Azure Web App Name",
-			"default": "incident-mgmt-kb",
-			"type": "promptString"
-		},
-		{
-			"id": "appServicePlan",
-			"description": "App Service Plan Name",
-			"default": "incident-mgmt-plan",
-			"type": "promptString"
 		}
 	]
 }

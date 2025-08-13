@@ -30,7 +30,12 @@ A modern, intelligent incident management system that helps technical engineers 
 
 ## 📦 Installation & Setup
 
-1. **Navigate to the project directory**
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Local Development
+1. **Clone the repository**
 2. **Install dependencies**:
    ```bash
    npm install
@@ -42,6 +47,24 @@ A modern, intelligent incident management system that helps technical engineers 
    ```
 
 4. **Open your browser** and navigate to `http://localhost:3000`
+
+## 🚀 Deployment
+
+This project is configured for **manual deployment only**. See [MANUAL-DEPLOYMENT.md](./MANUAL-DEPLOYMENT.md) for detailed deployment instructions to various platforms including:
+
+- Vercel (Recommended)
+- Netlify  
+- Azure App Service
+- GitHub Pages (Static)
+
+### Quick Deploy Commands
+```bash
+# Build for production
+npm run build
+
+# Start production server (for Node.js platforms)
+npm start
+```
 
 ```
 src/

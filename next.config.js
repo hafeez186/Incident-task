@@ -1,13 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Conditional output based on environment
-  ...(process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true' && { output: 'export' }),
-  ...(process.env.AZURE_WEBAPP === 'true' && { output: 'standalone' }),
   trailingSlash: true,
   
-  // Optimize images for deployment
+  // Optimize images
   images: {
-    unoptimized: process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true', // Only unoptimized for static export
+    unoptimized: false,
     domains: [],
   },
 

@@ -7,13 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "test": "echo 'No tests yet' && exit 0",
-    "test:ci": "npm run lint && npm run build",
-    "export": "next export",
-    "build:static": "next build",
-    "build:azure": "next build",
-    "start:azure": "next start"
+    "lint:fix": "next lint --fix"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
