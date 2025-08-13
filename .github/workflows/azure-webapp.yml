@@ -42,7 +42,7 @@ jobs:
         tar -czf deployment.tar.gz --exclude='node_modules/.cache' --exclude='.git' --exclude='.github' .
 
     - name: Upload deployment package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: deployment-package
         path: deployment.tar.gz
@@ -59,7 +59,7 @@ jobs:
 
     steps:
     - name: Download deployment package
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: deployment-package
 
@@ -68,7 +68,7 @@ jobs:
 
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
