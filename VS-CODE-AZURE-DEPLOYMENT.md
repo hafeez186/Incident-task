@@ -94,3 +94,11 @@ Set these in your Azure App Service → Configuration → Application Settings:
 - **VS Code Output Panel**: View deployment progress
 - **Azure Portal**: Monitor app performance
 - **Log Stream**: Real-time application logs
+
+## Updated GitHub Actions (August 2025)
+
+✅ **Latest Action Versions Used:**
+- `actions/upload-artifact@v4` (updated from deprecated v3)
+- `actions/download-artifact@v4` (updated from deprecated v3)
+- `azure/webapps-deploy@v3` (latest version)
+- `actions/checkout@v4` and `actions/setup-node@v4`
