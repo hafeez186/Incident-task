@@ -23,8 +23,8 @@ winget install Microsoft.AzureCLI
 Run the deployment script to create your Azure Web App:
 
 ```powershell
-# Navigate to your project directory
-cd "c:\codevibe\Incident Managment tool kb assistance"
+# Navigate to your project directory (adjust the path to your actual project location)
+cd "your-project-directory"
 
 # Run the Azure deployment script
 .\scripts\deploy-azure-webapp.ps1 -ResourceGroupName "rg-incident-mgmt" -WebAppName "your-unique-app-name" -Location "East US"

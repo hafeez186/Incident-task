@@ -7,7 +7,6 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: incident-management-kb    # Set this to your Azure Web App name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'               # Set this to the path of your project
   NODE_VERSION: '18.x'                         # Set this to the node version to use
 
 permissions:
@@ -17,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Node.js
@@ -29,16 +28,24 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Build for Azure Web App
+    - name: Build application for Azure
       env:
         AZURE_WEBAPP: true
+        NODE_ENV: production
       run: npm run build
 
-    - name: Upload artifact for deployment job
+    - name: Create deployment package
+      run: |
+        # Remove dev dependencies and unnecessary files for deployment
+        npm prune --production
+        # Create a clean package for deployment
+        tar -czf deployment.tar.gz --exclude='node_modules/.cache' --exclude='.git' --exclude='.github' .
+
+    - name: Upload deployment package
       uses: actions/upload-artifact@v3
       with:
-        name: node-app
-        path: .
+        name: deployment-package
+        path: deployment.tar.gz
 
   deploy:
     permissions:
@@ -48,17 +55,21 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    if: github.ref == 'refs/heads/main'
 
     steps:
-    - name: Download artifact from build job
+    - name: Download deployment package
       uses: actions/download-artifact@v3
       with:
-        name: node-app
+        name: deployment-package
 
-    - name: 'Deploy to Azure Web App'
+    - name: Extract deployment package
+      run: tar -xzf deployment.tar.gz
+
+    - name: Deploy to Azure Web App
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        package: .
