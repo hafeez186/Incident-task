@@ -36,10 +36,8 @@ jobs:
 
     - name: Create deployment package
       run: |
-        # Remove dev dependencies and unnecessary files for deployment
         npm prune --production
-        # Create a clean package for deployment
-        tar -czf deployment.tar.gz --exclude='node_modules/.cache' --exclude='.git' --exclude='.github' .
+        tar -czf deployment.tar.gz .next package.json node_modules public next.config.js
 
     - name: Upload deployment package
       uses: actions/upload-artifact@v4
