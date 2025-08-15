@@ -7,8 +7,8 @@ const FILES_TO_CACHE = [
   '/',
   '/offline',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  'icons/icon-192x192.png',
+  'icons/icon-512x512.png',
   // Add your critical assets here
 ]
 
@@ -141,8 +141,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'Incident Management Alert',
     body: 'You have a new notification',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
+    icon: 'icons/icon-192x192.png',
+    badge: 'icons/badge-72x72.png',
     data: {}
   }
 
